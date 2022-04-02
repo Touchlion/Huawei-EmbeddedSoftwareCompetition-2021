@@ -11,13 +11,13 @@ typedef long long LL;
 const LL inf = 1e18;
 int N; int E; int C; int D; int PS; int bst_number = 0; int sat_number = 0; int anscount = 0;
 int ans[5005];
-int already_has_home[5005];//already_has_home[bst_id]Îª0±íÊ¾»¹Ã»ÕÒµ½¼ÒµÄ»ùÕ¾£¬Îª1±íÊ¾ÒÑ¾­ÕÒµ½¼Ò
+int already_has_home[5005];//already_has_home[bst_id]ä¸º0è¡¨ç¤ºè¿˜æ²¡æ‰¾åˆ°å®¶çš„åŸºç«™ï¼Œä¸º1è¡¨ç¤ºå·²ç»æ‰¾åˆ°å®¶
 int already_has_home2[5005];
 int already_research[5005];
-int real_dis_to_sat[5005];//real_dis_to_sat[sat_id]±íÊ¾ÏÖÔÚ¿¼ÂÇµÄ»ùÕ¾µ½sat_idÎÀĞÇµÄÕæÊµ¾àÀë
-int type[5005];//0±íÊ¾»ùÕ¾£¬1±íÊ¾Î´¾ö¶¨ÀàĞÍµÄÎÀĞÇ£¬2±íÊ¾ÖĞ×ªÎÀĞÇ£¬3±íÊ¾½ÓÊÕÎÀĞÇ
+int real_dis_to_sat[5005];//real_dis_to_sat[sat_id]è¡¨ç¤ºç°åœ¨è€ƒè™‘çš„åŸºç«™åˆ°sat_idå«æ˜Ÿçš„çœŸå®è·ç¦»
+int type[5005];//0è¡¨ç¤ºåŸºç«™ï¼Œ1è¡¨ç¤ºæœªå†³å®šç±»å‹çš„å«æ˜Ÿï¼Œ2è¡¨ç¤ºä¸­è½¬å«æ˜Ÿï¼Œ3è¡¨ç¤ºæ¥æ”¶å«æ˜Ÿ
 int type2[5005];
-int sat_used_times[5005];//Ò»¸öÎÀĞÇÁ¬½ÓµÄ»ùÕ¾¸öÊı
+int sat_used_times[5005];//ä¸€ä¸ªå«æ˜Ÿè¿æ¥çš„åŸºç«™ä¸ªæ•°
 int expect_target_in_search = -1; int shortest_listp = 0; int now_search_bst;
 int shortest_path[5005];
 int can_be_farest[5005];
@@ -27,18 +27,18 @@ vector<int>route2[6000];
 vector<int>accessible_sat_id[5005];
 struct Footprint
 {
-	int total = 0;//ÄÜµ½´ïÕâ¸öÎÀĞÇµÄ£¨»¹Ã»ÕÒµ½¼ÒµÄ£©»ùÕ¾µÄ×ÜÊı£¬ÊµÊ±¸üĞÂ
+	int total = 0;//èƒ½åˆ°è¾¾è¿™ä¸ªå«æ˜Ÿçš„ï¼ˆè¿˜æ²¡æ‰¾åˆ°å®¶çš„ï¼‰åŸºç«™çš„æ€»æ•°ï¼Œå®æ—¶æ›´æ–°
 	int bst_id[5005];
 	int bst_dis[5005];
-	LL sum_dis = 0;//ÄÜµ½´ïÕâ¸öÎÀĞÇµÄ£¨»¹Ã»ÕÒµ½¼ÒµÄ£©ËùÓĞ»ùÕ¾µ½´ËµÄ¾àÀë×ÜºÍ£¬ÊµÊ±¸üĞÂ
-	void add(int id, int dis)//Ôö¼ÓÒ»¸öĞÂµ½´ïµÄ»ùÕ¾¼ÇÂ¼
+	LL sum_dis = 0;//èƒ½åˆ°è¾¾è¿™ä¸ªå«æ˜Ÿçš„ï¼ˆè¿˜æ²¡æ‰¾åˆ°å®¶çš„ï¼‰æ‰€æœ‰åŸºç«™åˆ°æ­¤çš„è·ç¦»æ€»å’Œï¼Œå®æ—¶æ›´æ–°
+	void add(int id, int dis)//å¢åŠ ä¸€ä¸ªæ–°åˆ°è¾¾çš„åŸºç«™è®°å½•
 	{
 		bst_id[id] = 1;
 		bst_dis[id] = dis;
 		sum_dis += dis*cs[id];
 		total++;
 	}
-	void update_dis(int id, int new_dis)//ÓÃ¸ü¶ÌµÄ¾àÀë¸üĞÂÒ»¸ö»ùÕ¾µÄÒÑÓĞ¼ÇÂ¼
+	void update_dis(int id, int new_dis)//ç”¨æ›´çŸ­çš„è·ç¦»æ›´æ–°ä¸€ä¸ªåŸºç«™çš„å·²æœ‰è®°å½•
 	{
 		if (bst_id[id] == 1)
 		{
@@ -58,13 +58,13 @@ struct Footprint
 struct Satellite
 {
 	int id;
-	Footprint footprint;//µÚi¸ö»ùÕ¾ÏòÍâbfsÊ±£¬µ½´ïÕâ¸öÎÀĞÇ£¬¾ÍÔÚ´ËÉèÖÃfootprint.bst_id[i]=1±íÃ÷À´¹ı£¬²¢ÁôÏÂµ½´ËµÄ¾àÀëfootprint.bst_dis[i]
-}sat[5005];//°üº¬ËùÓĞ½áµã£¬¡¾»ùÕ¾Ò²ÔÚÆäÖĞ¡¿
-struct Node//ÁÚ½Óµã
+	Footprint footprint;//ç¬¬iä¸ªåŸºç«™å‘å¤–bfsæ—¶ï¼Œåˆ°è¾¾è¿™ä¸ªå«æ˜Ÿï¼Œå°±åœ¨æ­¤è®¾ç½®footprint.bst_id[i]=1è¡¨æ˜æ¥è¿‡ï¼Œå¹¶ç•™ä¸‹åˆ°æ­¤çš„è·ç¦»footprint.bst_dis[i]
+}sat[5005];//åŒ…å«æ‰€æœ‰ç»“ç‚¹ï¼Œã€åŸºç«™ä¹Ÿåœ¨å…¶ä¸­ã€‘
+struct Node//é‚»æ¥ç‚¹
 {
 	int id;
 	LL dis;
-	int target_sat_id = -1;//-1±íÊ¾Ã»ÓĞ»ùÕ¾Õ÷ÓÃ¹ıÕâÌõ±ß
+	int target_sat_id = -1;//-1è¡¨ç¤ºæ²¡æœ‰åŸºç«™å¾ç”¨è¿‡è¿™æ¡è¾¹
 	int target_sat_id2 = -1;
 	Node(int ID, LL DIS, int Target_sat_id = -1, int Target_sat_id2 = -1)
 	{
@@ -72,7 +72,7 @@ struct Node//ÁÚ½Óµã
 	}
 	~Node(){}
 };
-struct List_node//µ¥ÏòÁ´±íµÄ½áµã
+struct List_node//å•å‘é“¾è¡¨çš„ç»“ç‚¹
 {
 	int bst_id;
 	int expect_sat;
@@ -84,7 +84,7 @@ struct List_node//µ¥ÏòÁ´±íµÄ½áµã
 		next = NULL;
 	}
 };
-struct Bst_list//ÊÔÍ¼°Ñ»ùÕ¾µÄ¿¼ÂÇË³Ğò´®³ÉÒ»¸öÁ´±í
+struct Bst_list//è¯•å›¾æŠŠåŸºç«™çš„è€ƒè™‘é¡ºåºä¸²æˆä¸€ä¸ªé“¾è¡¨
 {
 	List_node *head = NULL;
 	List_node *tail = NULL;
@@ -127,7 +127,7 @@ bool cmp(const Node a, const Node b)
 {
 	return a.id < b.id;
 }
-vector<Node>G[6000];//ÓÃÁÚ½Ó±íÊµÏÖÍ¼
+vector<Node>G[6000];//ç”¨é‚»æ¥è¡¨å®ç°å›¾
 int edge_target(int from, int to)
 {
 	for (int i = 0; i < G[from].size(); i++)
@@ -199,7 +199,7 @@ int the_distance(int from, int to)
 	}
 	return -1;
 }
-void all_bst_bfs()//ËùÓĞ»ùÕ¾ÏòÍâbfs£¬ÔÚÄÜµ½´ïµÄÎÀĞÇ´¦ÁôÏÂfootprint
+void all_bst_bfs()//æ‰€æœ‰åŸºç«™å‘å¤–bfsï¼Œåœ¨èƒ½åˆ°è¾¾çš„å«æ˜Ÿå¤„ç•™ä¸‹footprint
 {
 	int visited[5005];
 	for (int i = 0; i < N; i++)
@@ -214,7 +214,7 @@ void all_bst_bfs()//ËùÓĞ»ùÕ¾ÏòÍâbfs£¬ÔÚÄÜµ½´ïµÄÎÀĞÇ´¦ÁôÏÂfootprint
 			accessible_sat_id[i].clear();
 		}
 	}
-	for (int i = 0; i < N; i++)//ÕâÀïµÄiÎª»ùÕ¾id£¨ÅÅ³ıÎÀĞÇ£©
+	for (int i = 0; i < N; i++)//è¿™é‡Œçš„iä¸ºåŸºç«™idï¼ˆæ’é™¤å«æ˜Ÿï¼‰
 	{
 		if (type[i] != 0)continue;
 		memset(visited, 0, sizeof(visited));
@@ -234,12 +234,12 @@ void all_bst_bfs()//ËùÓĞ»ùÕ¾ÏòÍâbfs£¬ÔÚÄÜµ½´ïµÄÎÀĞÇ´¦ÁôÏÂfootprint
 					Node a(G[v.id][j].id, v.dis + G[v.id][j].dis);
 					sat[G[v.id][j].id].footprint.add(i, v.dis + G[v.id][j].dis);
 					q.push(a);
-					accessible_sat_id[i].push_back(G[v.id][j].id);//½«»ùÕ¾i "ÄÜµ½´ïµÄ" ËùÓĞÎÀĞÇµÄid¶¼¼ÇÂ¼ÏÂÀ´
+					accessible_sat_id[i].push_back(G[v.id][j].id);//å°†åŸºç«™i "èƒ½åˆ°è¾¾çš„" æ‰€æœ‰å«æ˜Ÿçš„idéƒ½è®°å½•ä¸‹æ¥
 				}
-				else if (visited[G[v.id][j].id] == 1)//ÊÔÍ¼ÈÃbfsÄÜµÃµ½×î¶ÌÂ·¾¶Ê÷
+				else if (visited[G[v.id][j].id] == 1)//è¯•å›¾è®©bfsèƒ½å¾—åˆ°æœ€çŸ­è·¯å¾„æ ‘
 				{
 					if (v.dis + G[v.id][j].dis > sat[G[v.id][j].id].footprint.bst_dis[i])continue;
-					Node a(G[v.id][j].id, v.dis + G[v.id][j].dis);//£¨Èç¹ûÕâÊ±¶ÓÁĞÖĞÓĞÏàÍ¬µÄ½áµã£¬»á¶àºÄÊ±¼ä
+					Node a(G[v.id][j].id, v.dis + G[v.id][j].dis);//ï¼ˆå¦‚æœè¿™æ—¶é˜Ÿåˆ—ä¸­æœ‰ç›¸åŒçš„ç»“ç‚¹ï¼Œä¼šå¤šè€—æ—¶é—´
 					sat[G[v.id][j].id].footprint.update_dis(i, v.dis + G[v.id][j].dis);
 					q.push(a);
 				}
@@ -248,10 +248,10 @@ void all_bst_bfs()//ËùÓĞ»ùÕ¾ÏòÍâbfs£¬ÔÚÄÜµ½´ïµÄÎÀĞÇ´¦ÁôÏÂfootprint
 		}
 	}
 }
-bool cmp_Alternative(int a, int b)//////////¶ÔÓÚaºÍb¶¼ÒÑ¾­ÊÇ½ÓÊÕÎÀĞÇ£¬»ùÕ¾Ó¦¸ÃÖ±½ÓÑ¡½ü£¨Àë×Ô¼º½ü£©µÄÄÇ¸ö£¬¶ø²»ÓÃ¹ÜÄÄ¸öµÄ×ÜtotalºÍ×Üdis
+bool cmp_Alternative(int a, int b)//////////å¯¹äºaå’Œbéƒ½å·²ç»æ˜¯æ¥æ”¶å«æ˜Ÿï¼ŒåŸºç«™åº”è¯¥ç›´æ¥é€‰è¿‘ï¼ˆç¦»è‡ªå·±è¿‘ï¼‰çš„é‚£ä¸ªï¼Œè€Œä¸ç”¨ç®¡å“ªä¸ªçš„æ€»totalå’Œæ€»dis
 {
 	if (type[a] == 3 && type[b] == 3)return real_dis_to_sat[a]<real_dis_to_sat[b];
-	if (type[a] == 3 && type[b] != 3)//Ò»¸öÎÀĞÇËÑË÷µ½Ò»¸ötypeÎª3µÄÎÀĞÇ£¬²»¹Ë¾àÀë¶àÔ¶¶øÖ±½Ó¹ıÈ¥£¬²»Ò»¶¨ºÏÀí
+	if (type[a] == 3 && type[b] != 3)//ä¸€ä¸ªå«æ˜Ÿæœç´¢åˆ°ä¸€ä¸ªtypeä¸º3çš„å«æ˜Ÿï¼Œä¸é¡¾è·ç¦»å¤šè¿œè€Œç›´æ¥è¿‡å»ï¼Œä¸ä¸€å®šåˆç†
 	{
 		return true;
 	}
@@ -260,18 +260,18 @@ bool cmp_Alternative(int a, int b)//////////¶ÔÓÚaºÍb¶¼ÒÑ¾­ÊÇ½ÓÊÕÎÀĞÇ£¬»ùÕ¾Ó¦¸ÃÖ±
 		return false;
 	}
 
-	if (sat[a].footprint.total > sat[b].footprint.total)return true;//ÄÜµ½´ïµÄ»ùÕ¾ÊıµÄÓÅÏÈ¼¶´óÓÚ¾àÀëµÄÓÅÏÈ¼¶¡¾¿ÉÄÜÒªÓëÂ·¾¶³¤¶ÈÓĞ»ú½áºÏÀ´ÅĞ¶Ï¡¿
+	if (sat[a].footprint.total > sat[b].footprint.total)return true;//èƒ½åˆ°è¾¾çš„åŸºç«™æ•°çš„ä¼˜å…ˆçº§å¤§äºè·ç¦»çš„ä¼˜å…ˆçº§ã€å¯èƒ½è¦ä¸è·¯å¾„é•¿åº¦æœ‰æœºç»“åˆæ¥åˆ¤æ–­ã€‘
 	if (sat[a].footprint.total < sat[b].footprint.total)return false;
 	return sat[a].footprint.sum_dis < sat[b].footprint.sum_dis;
 
 }
-bool cmp_Alternative2(int a, int b)//ÔõÃ´Ñù²ÅÄÜÈÃÖ»½ÓÊÕÒ»Á½¸öµÄ½ÓÊÕÎÀĞÇµÄÓÅÏÈ¼¶±äµÍ
+bool cmp_Alternative2(int a, int b)//æ€ä¹ˆæ ·æ‰èƒ½è®©åªæ¥æ”¶ä¸€ä¸¤ä¸ªçš„æ¥æ”¶å«æ˜Ÿçš„ä¼˜å…ˆçº§å˜ä½
 {
 	if (type[a] == 3 && type[b] != 3)return true;
 	if (type[b] == 3 && type[a] != 3)return false;
 	if (type[a] == 3 && type[b] == 3)
 	{
-		return real_dis_to_sat[a] < real_dis_to_sat[b];//²»Ò»¶¨ºÏÀí
+		return real_dis_to_sat[a] < real_dis_to_sat[b];//ä¸ä¸€å®šåˆç†
 	}
 
 	return real_dis_to_sat[a] < real_dis_to_sat[b];
@@ -285,7 +285,7 @@ bool cmp_Alternative3(int a, int b)
 	{
 		if (sat_used_times[b] == 0 && sat_used_times[a] > sat_used_times[b])return true;
 		if (sat_used_times[a] == 0 && sat_used_times[b] > sat_used_times[a])return false;
-		if (sat_used_times[b] == 1 && sat_used_times[a] > sat_used_times[b])//[][]]0ÄØ£¬µÈÓÚÄØ
+		if (sat_used_times[b] == 1 && sat_used_times[a] > sat_used_times[b])//[][]]0å‘¢ï¼Œç­‰äºå‘¢
 		{
 			return true;
 		}
@@ -298,7 +298,7 @@ bool cmp_Alternative3(int a, int b)
 		return real_dis_to_sat[a] < real_dis_to_sat[b];
 
 	}
-	///////µ±aºÍb¶¼ÊÇÎ´°²ÅÅ¹ıÉí·İµÄÎÀĞÇÊ±
+	///////å½“aå’Œbéƒ½æ˜¯æœªå®‰æ’è¿‡èº«ä»½çš„å«æ˜Ÿæ—¶
 	if (sat_used_times[a] > sat_used_times[b])return true;
 	if (sat_used_times[b] > sat_used_times[a])return false;
 	return real_dis_to_sat[a] < real_dis_to_sat[b];
@@ -431,7 +431,7 @@ bool cmp_shortest_list(shortest_list_node a, shortest_list_node b)//>
 {
 	return a.dis_to_source > b.dis_to_source;
 }
-int bfs_with_target(int i, int sat_id, int research_flag = 0)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½ÎÀĞÇsat_idµÄ(ÎŞ³åÍ»)Â·¾¶£¬±£´æÔÚans[]ÖĞ£¬ÆäÖĞans[0]==sat_idÇÒans[ansp-1]Îªbst_id(µ¹Ğğ)£¬²¢·µ»Øansp£¬Ê§°ÜÔò·µ»Ø-1
+int bfs_with_target(int i, int sat_id, int research_flag = 0)//å¯»æ±‚ä¸€æ¡ä»åŸºç«™iåˆ°å«æ˜Ÿsat_idçš„(æ— å†²çª)è·¯å¾„ï¼Œä¿å­˜åœ¨ans[]ä¸­ï¼Œå…¶ä¸­ans[0]==sat_idä¸”ans[ansp-1]ä¸ºbst_id(å€’å™)ï¼Œå¹¶è¿”å›anspï¼Œå¤±è´¥åˆ™è¿”å›-1
 {
 	int visited[5005]; int flag = 0;
 	int father_id[5005]; int real_dis[5005];
@@ -452,7 +452,7 @@ int bfs_with_target(int i, int sat_id, int research_flag = 0)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½
 			{
 				continue;
 			}
-			//ÓĞÂ·¾¶³åÍ»µÄ±ßÖ±½Ó²»×ß
+			//æœ‰è·¯å¾„å†²çªçš„è¾¹ç›´æ¥ä¸èµ°
 			if (research_flag == 1 && this_target != -1 && this_target != sat_id&&v.id != i)
 			{
 				int other_use_this_edge = 0;
@@ -478,7 +478,7 @@ int bfs_with_target(int i, int sat_id, int research_flag = 0)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½
 			if (visited[G[v.id][j].id] == 0)
 			{
 				if (v.dis + G[v.id][j].dis > D)continue;
-				if (G[v.id][j].id == sat_id)//³É¹¦µ½´ïÁËÄ¿±ê£¬²»ÓÃÑØ×ÅÕâÀï¼ÌĞøËÑË÷
+				if (G[v.id][j].id == sat_id)//æˆåŠŸåˆ°è¾¾äº†ç›®æ ‡ï¼Œä¸ç”¨æ²¿ç€è¿™é‡Œç»§ç»­æœç´¢
 				{
 					flag = 1;
 					visited[G[v.id][j].id] = 1;
@@ -486,7 +486,7 @@ int bfs_with_target(int i, int sat_id, int research_flag = 0)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½
 					real_dis[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 3)//²»ÊÇÄ¿±êÎÀĞÇµÄ½ÓÊÕÎÀĞÇ£¬²»·ÅÔÚÂ·¾¶Ê÷ÖĞ
+				if (type[G[v.id][j].id] == 3)//ä¸æ˜¯ç›®æ ‡å«æ˜Ÿçš„æ¥æ”¶å«æ˜Ÿï¼Œä¸æ”¾åœ¨è·¯å¾„æ ‘ä¸­
 				{
 					visited[G[v.id][j].id] = 1;
 					continue;
@@ -537,11 +537,11 @@ int bfs_with_target(int i, int sat_id, int research_flag = 0)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½
 int go_with_other(int i, int from, int to, int target_sat, int *father_id)
 {
 	int ans[5005]; int ansp = 0; int target; int dis0 = 0;
-	int find = from;//ÔÚµ½´ïv.idµÄÂ·¶ÎÉÏ£¬¼ì²éÓĞÎŞ³åÍ»
+	int find = from;//åœ¨åˆ°è¾¾v.idçš„è·¯æ®µä¸Šï¼Œæ£€æŸ¥æœ‰æ— å†²çª
 	int jump = 0;
 	while (find != i)
 	{
-		ans[ansp++] = find;//µ¹Ğğ
+		ans[ansp++] = find;//å€’å™
 		find = father_id[find];
 		target = edge_target(find, ans[ansp - 1]);
 		if (target != -1 && target != target_sat)
@@ -575,11 +575,11 @@ int go_with_other(int i, int from, int to, int target_sat, int *father_id)
 						dis1 += the_distance(route[x][w], route[x][w - 1]);
 					}
 					if (dis0 + dis1>D)break;
-					for (int w = ansp - 2; w >= 0; w--)//È·¶¨ÑØÍ¾ÎÀĞÇÎªÖĞ×ªÎÀĞÇÉí·İ
+					for (int w = ansp - 2; w >= 0; w--)//ç¡®å®šæ²¿é€”å«æ˜Ÿä¸ºä¸­è½¬å«æ˜Ÿèº«ä»½
 					{
 						type[ans[w]] = 2;
 					}
-					for (int w = ansp - 1; w >= 1; w--)//¸øÂ·¾¶ÉÏÃ¿Ìõ±ß´òÉÏ±ê¼Ç£¨½ÓÊÕÎÀĞÇµÄid
+					for (int w = ansp - 1; w >= 1; w--)//ç»™è·¯å¾„ä¸Šæ¯æ¡è¾¹æ‰“ä¸Šæ ‡è®°ï¼ˆæ¥æ”¶å«æ˜Ÿçš„id
 					{
 						set_edge_target(ans[w], ans[w - 1], target_sat);
 					}
@@ -594,7 +594,7 @@ int go_with_other(int i, int from, int to, int target_sat, int *father_id)
 
 					route[i].push_back(-1);
 					already_has_home[i] = 1;
-					for (int w = 0; w < N; w++)//¸æËßËùÓĞÎÀĞÇ(°üÀ¨ÏÖÔÚÖ¸¶¨µÄ½ÓÊÕÎÀĞÇ)£¬´Ë»ùÕ¾ÒÑ¾­ÓĞ¼Ò£¬¸üĞÂtotalºÍsum_dis
+					for (int w = 0; w < N; w++)//å‘Šè¯‰æ‰€æœ‰å«æ˜Ÿ(åŒ…æ‹¬ç°åœ¨æŒ‡å®šçš„æ¥æ”¶å«æ˜Ÿ)ï¼Œæ­¤åŸºç«™å·²ç»æœ‰å®¶ï¼Œæ›´æ–°totalå’Œsum_dis
 					{
 						if (sat[w].footprint.bst_id[i] != 0)
 						{
@@ -618,7 +618,7 @@ void keep_type_correct()
 		if (type[x] == 0)reset_type[x] = 0;
 		else reset_type[x] = 1;
 	}
-	for (int x = 0; x < N; x++)//±£³ÖÎÀĞÇÉí·İµÄÕıÈ·ĞÔ
+	for (int x = 0; x < N; x++)//ä¿æŒå«æ˜Ÿèº«ä»½çš„æ­£ç¡®æ€§
 	{
 		if (type[x] == 0)
 		{
@@ -645,7 +645,7 @@ void keep_type2_correct()
 		if (type2[x] == 0)reset_type2[x] = 0;
 		else reset_type2[x] = 1;
 	}
-	for (int x = 0; x < N; x++)//±£³ÖÎÀĞÇÉí·İµÄÕıÈ·ĞÔ
+	for (int x = 0; x < N; x++)//ä¿æŒå«æ˜Ÿèº«ä»½çš„æ­£ç¡®æ€§
 	{
 		if (type2[x] == 0)
 		{
@@ -664,7 +664,7 @@ void keep_type2_correct()
 		type2[x] = reset_type2[x];
 	}
 }
-void keep_target_correct()//Ê±¼ä´ú¼Û»¹Âù¸ßµÄ
+void keep_target_correct()//æ—¶é—´ä»£ä»·è¿˜è›®é«˜çš„
 {
 	for (int i = 0; i < N; i++)
 	{
@@ -717,7 +717,7 @@ void search(int i, int expect_target)
 	int visited[5005]; int exist_in_alternative[5005];  int father_id[5005];
 	int ansp = 0;
 	expect_target_in_search = expect_target;
-	vector<int>alternative_sat;//ÔÚ»ùÕ¾iÏòÍâbfs¹ı³ÌÖĞÕÒµ½µÄ¼¸¸öÊÊºÏÉèÖÃÎª½ÓÊÕÎÀĞÇµÄÎÀĞÇid
+	vector<int>alternative_sat;//åœ¨åŸºç«™iå‘å¤–bfsè¿‡ç¨‹ä¸­æ‰¾åˆ°çš„å‡ ä¸ªé€‚åˆè®¾ç½®ä¸ºæ¥æ”¶å«æ˜Ÿçš„å«æ˜Ÿid
 	memset(visited, 0, sizeof(visited));
 	memset(father_id, -1, sizeof(father_id));
 	memset(exist_in_alternative, 0, sizeof(exist_in_alternative));
@@ -737,12 +737,12 @@ void search(int i, int expect_target)
 
 			if (visited[G[v.id][j].id] == 0)
 			{
-				if (v.dis + G[v.id][j].dis > D)//Èç¹ûÔÚÏŞÖÆ¾àÀëÄÚ£¬ÎŞ·¨µ½´ïG[v.id][j].id
+				if (v.dis + G[v.id][j].dis > D)//å¦‚æœåœ¨é™åˆ¶è·ç¦»å†…ï¼Œæ— æ³•åˆ°è¾¾G[v.id][j].id
 				{
 					continue;
 				}
 				int flag = 0; int lost_bst_id = -1;
-				if (type[G[v.id][j].id] == 3)//G[v.id][j].idÒÑ¾­±»È·¶¨¹ıÎª½ÓÊÕÎÀĞÇ£¬Ö±½ÓÁĞÈë±¸Ñ¡£¬Í£Ö¹ÕâÌõ·ÖÖ§µÄËÑË÷
+				if (type[G[v.id][j].id] == 3)//G[v.id][j].idå·²ç»è¢«ç¡®å®šè¿‡ä¸ºæ¥æ”¶å«æ˜Ÿï¼Œç›´æ¥åˆ—å…¥å¤‡é€‰ï¼Œåœæ­¢è¿™æ¡åˆ†æ”¯çš„æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -754,7 +754,7 @@ void search(int i, int expect_target)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 2)//Èç¹ûÒÑ¾­È·¶¨ÎªÖĞ×ªÎÀĞÇ£¬Ôò²»¿ÉÄÜÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§¼ÌĞøËÑË÷
+				if (type[G[v.id][j].id] == 2)//å¦‚æœå·²ç»ç¡®å®šä¸ºä¸­è½¬å«æ˜Ÿï¼Œåˆ™ä¸å¯èƒ½åˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯ç»§ç»­æœç´¢
 				{
 					visited[G[v.id][j].id] = 1;
 					father_id[G[v.id][j].id] = v.id;
@@ -763,7 +763,7 @@ void search(int i, int expect_target)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 1)//Èç¹ûÊÇÎ´°²ÅÅ¹ıÀàĞÍµÄÎÀĞÇ£¬ÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§ËÑË÷
+				if (type[G[v.id][j].id] == 1)//å¦‚æœæ˜¯æœªå®‰æ’è¿‡ç±»å‹çš„å«æ˜Ÿï¼Œåˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -779,12 +779,12 @@ void search(int i, int expect_target)
 				}
 
 			}
-			else if (visited[G[v.id][j].id] == 1)//ÊÔÍ¼ÈÃbfsÄÜµÃµ½×î¶ÌÂ·¾¶Ê÷
+			else if (visited[G[v.id][j].id] == 1)//è¯•å›¾è®©bfsèƒ½å¾—åˆ°æœ€çŸ­è·¯å¾„æ ‘
 			{
 				
 				if (v.dis + G[v.id][j].dis > real_dis_to_sat[G[v.id][j].id])continue;
 				int flag = 0; int lost_bst_id;
-				if (type[G[v.id][j].id] == 3)//G[v.id][j].idÒÑ¾­±»È·¶¨¹ıÎª½ÓÊÕÎÀĞÇ£¬Ö±½ÓÁĞÈë±¸Ñ¡£¬Í£Ö¹ÕâÌõ·ÖÖ§µÄËÑË÷
+				if (type[G[v.id][j].id] == 3)//G[v.id][j].idå·²ç»è¢«ç¡®å®šè¿‡ä¸ºæ¥æ”¶å«æ˜Ÿï¼Œç›´æ¥åˆ—å…¥å¤‡é€‰ï¼Œåœæ­¢è¿™æ¡åˆ†æ”¯çš„æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -795,7 +795,7 @@ void search(int i, int expect_target)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 2)//Èç¹ûÒÑ¾­È·¶¨ÎªÖĞ×ªÎÀĞÇ£¬Ôò²»¿ÉÄÜÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§¼ÌĞøËÑË÷
+				if (type[G[v.id][j].id] == 2)//å¦‚æœå·²ç»ç¡®å®šä¸ºä¸­è½¬å«æ˜Ÿï¼Œåˆ™ä¸å¯èƒ½åˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯ç»§ç»­æœç´¢
 				{
 					father_id[G[v.id][j].id] = v.id;
 					Node a(G[v.id][j].id, v.dis + G[v.id][j].dis);
@@ -803,7 +803,7 @@ void search(int i, int expect_target)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 1)//Èç¹ûÊÇÎ´°²ÅÅ¹ıÀàĞÍµÄÎÀĞÇ£¬ÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§ËÑË÷
+				if (type[G[v.id][j].id] == 1)//å¦‚æœæ˜¯æœªå®‰æ’è¿‡ç±»å‹çš„å«æ˜Ÿï¼Œåˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -851,7 +851,7 @@ void search(int i, int expect_target)
 			ans[ansp++] = find;
 		}
 		already_has_home[i] = 1;
-		for (int w = 0; w < N; w++)//¸æËßËùÓĞÎÀĞÇ(°üÀ¨ÏÖÔÚÖ¸¶¨µÄ½ÓÊÕÎÀĞÇ)£¬´Ë»ùÕ¾ÒÑ¾­ÓĞ¼Ò£¬¸üĞÂtotalºÍsum_dis
+		for (int w = 0; w < N; w++)//å‘Šè¯‰æ‰€æœ‰å«æ˜Ÿ(åŒ…æ‹¬ç°åœ¨æŒ‡å®šçš„æ¥æ”¶å«æ˜Ÿ)ï¼Œæ­¤åŸºç«™å·²ç»æœ‰å®¶ï¼Œæ›´æ–°totalå’Œsum_dis
 		{
 			if (sat[w].footprint.bst_id[i] != 0)
 			{
@@ -862,15 +862,15 @@ void search(int i, int expect_target)
 		}
 
 
-		type[ans[0]] = 3;//È·¶¨½ÓÊÕÎÀĞÇÉí·İ
-		for (int w = 0; w < N; w++)//ÈÃ "ÄÜµ½´ï" Õâ¸ö½ÓÊÕÎÀĞÇµÄÆäËû»¹Ã»ÓĞ¼ÒµÄ»ùÕ¾½ô¸úÔÚ±íÍ·ºóÃæ
+		type[ans[0]] = 3;//ç¡®å®šæ¥æ”¶å«æ˜Ÿèº«ä»½
+		for (int w = 0; w < N; w++)//è®© "èƒ½åˆ°è¾¾" è¿™ä¸ªæ¥æ”¶å«æ˜Ÿçš„å…¶ä»–è¿˜æ²¡æœ‰å®¶çš„åŸºç«™ç´§è·Ÿåœ¨è¡¨å¤´åé¢
 		{
 			if (sat[ans[0]].footprint.bst_id[w] != 0 && already_has_home[w] == 0)
 			{
 				bst_list.insert_after_head(w, ans[0]);
 			}
 		}
-		for (int w = ansp - 2; w >= 1; w--)//È·¶¨ÑØÍ¾ÎÀĞÇÎªÖĞ×ªÎÀĞÇÉí·İ
+		for (int w = ansp - 2; w >= 1; w--)//ç¡®å®šæ²¿é€”å«æ˜Ÿä¸ºä¸­è½¬å«æ˜Ÿèº«ä»½
 		{
 			type[ans[w]] = 2;
 		}
@@ -882,7 +882,7 @@ void search(int i, int expect_target)
 		anscount++; check = 1;
 		break;
 	}
-	if (check == 0)//±éÀúÍêÕû¸ö±¸Ñ¡¶ÓÁĞ¶¼ÕÒ²»µ½ÄÜ×÷Îª½ÓÊÕÎÀĞÇµÄ£¨µ½´ïµÄÂ·ÉÏ¶¼·¢ÉúÁË³åÍ»£©
+	if (check == 0)//éå†å®Œæ•´ä¸ªå¤‡é€‰é˜Ÿåˆ—éƒ½æ‰¾ä¸åˆ°èƒ½ä½œä¸ºæ¥æ”¶å«æ˜Ÿçš„ï¼ˆåˆ°è¾¾çš„è·¯ä¸Šéƒ½å‘ç”Ÿäº†å†²çªï¼‰
 	{
 
 		int closest_sat = G[i][0].id; int closest_dis = G[i][0].dis;
@@ -907,7 +907,7 @@ void search(int i, int expect_target)
 				{
 					if (route[x][j] == closest_sat)
 					{
-						route[x][j + 1] = -1;//Ö±½Óµ½´ËÎªÖ¹£¬°ÑºóÂ·¶ÏÁË
+						route[x][j + 1] = -1;//ç›´æ¥åˆ°æ­¤ä¸ºæ­¢ï¼ŒæŠŠåè·¯æ–­äº†
 						set_edge_target(x, route[x][0], closest_sat);
 						for (int k = 1; k <= j; k++)
 						{
@@ -1022,7 +1022,7 @@ void research(int i, int cmp_flag = 2)
 	if (already_research[i] == 1)return;
 	int visited[5005]; int exist_in_alternative[5005];  int father_id[5005];
 	int ansp = 0;
-	vector<int>alternative_sat;//ÔÚ»ùÕ¾iÏòÍâbfs¹ı³ÌÖĞÕÒµ½µÄ¼¸¸öÊÊºÏÉèÖÃÎª½ÓÊÕÎÀĞÇµÄÎÀĞÇid
+	vector<int>alternative_sat;//åœ¨åŸºç«™iå‘å¤–bfsè¿‡ç¨‹ä¸­æ‰¾åˆ°çš„å‡ ä¸ªé€‚åˆè®¾ç½®ä¸ºæ¥æ”¶å«æ˜Ÿçš„å«æ˜Ÿid
 	memset(visited, 0, sizeof(visited));
 	memset(father_id, -1, sizeof(father_id));
 	memset(exist_in_alternative, 0, sizeof(exist_in_alternative));
@@ -1041,12 +1041,12 @@ void research(int i, int cmp_flag = 2)
 			}
 			if (visited[G[v.id][j].id] == 0)
 			{
-				if (v.dis + G[v.id][j].dis > D)//Èç¹ûÔÚÏŞÖÆ¾àÀëÄÚ£¬ÎŞ·¨µ½´ïG[v.id][j].id
+				if (v.dis + G[v.id][j].dis > D)//å¦‚æœåœ¨é™åˆ¶è·ç¦»å†…ï¼Œæ— æ³•åˆ°è¾¾G[v.id][j].id
 				{
 					continue;
 				}
 				int flag = 0; int lost_bst_id = -1;
-				if (type[G[v.id][j].id] == 3)//G[v.id][j].idÒÑ¾­±»È·¶¨¹ıÎª½ÓÊÕÎÀĞÇ£¬Ö±½ÓÁĞÈë±¸Ñ¡£¬Í£Ö¹ÕâÌõ·ÖÖ§µÄËÑË÷
+				if (type[G[v.id][j].id] == 3)//G[v.id][j].idå·²ç»è¢«ç¡®å®šè¿‡ä¸ºæ¥æ”¶å«æ˜Ÿï¼Œç›´æ¥åˆ—å…¥å¤‡é€‰ï¼Œåœæ­¢è¿™æ¡åˆ†æ”¯çš„æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1058,7 +1058,7 @@ void research(int i, int cmp_flag = 2)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 2)//Èç¹ûÒÑ¾­È·¶¨ÎªÖĞ×ªÎÀĞÇ£¬Ôò²»¿ÉÄÜÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§¼ÌĞøËÑË÷
+				if (type[G[v.id][j].id] == 2)//å¦‚æœå·²ç»ç¡®å®šä¸ºä¸­è½¬å«æ˜Ÿï¼Œåˆ™ä¸å¯èƒ½åˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯ç»§ç»­æœç´¢
 				{
 					visited[G[v.id][j].id] = 1;
 					father_id[G[v.id][j].id] = v.id;
@@ -1067,7 +1067,7 @@ void research(int i, int cmp_flag = 2)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 1)//Èç¹ûÊÇÎ´°²ÅÅ¹ıÀàĞÍµÄÎÀĞÇ£¬ÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§ËÑË÷
+				if (type[G[v.id][j].id] == 1)//å¦‚æœæ˜¯æœªå®‰æ’è¿‡ç±»å‹çš„å«æ˜Ÿï¼Œåˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1087,7 +1087,7 @@ void research(int i, int cmp_flag = 2)
 			{
 				if (v.dis + G[v.id][j].dis > real_dis_to_sat[G[v.id][j].id])continue;
 				int flag = 0; int lost_bst_id;
-				if (type[G[v.id][j].id] == 3)//G[v.id][j].idÒÑ¾­±»È·¶¨¹ıÎª½ÓÊÕÎÀĞÇ£¬Ö±½ÓÁĞÈë±¸Ñ¡£¬Í£Ö¹ÕâÌõ·ÖÖ§µÄËÑË÷
+				if (type[G[v.id][j].id] == 3)//G[v.id][j].idå·²ç»è¢«ç¡®å®šè¿‡ä¸ºæ¥æ”¶å«æ˜Ÿï¼Œç›´æ¥åˆ—å…¥å¤‡é€‰ï¼Œåœæ­¢è¿™æ¡åˆ†æ”¯çš„æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1098,7 +1098,7 @@ void research(int i, int cmp_flag = 2)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 2)//Èç¹ûÒÑ¾­È·¶¨ÎªÖĞ×ªÎÀĞÇ£¬Ôò²»¿ÉÄÜÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§¼ÌĞøËÑË÷
+				if (type[G[v.id][j].id] == 2)//å¦‚æœå·²ç»ç¡®å®šä¸ºä¸­è½¬å«æ˜Ÿï¼Œåˆ™ä¸å¯èƒ½åˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯ç»§ç»­æœç´¢
 				{
 					father_id[G[v.id][j].id] = v.id;
 					Node a(G[v.id][j].id, v.dis + G[v.id][j].dis);
@@ -1106,7 +1106,7 @@ void research(int i, int cmp_flag = 2)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type[G[v.id][j].id] == 1)//Èç¹ûÊÇÎ´°²ÅÅ¹ıÀàĞÍµÄÎÀĞÇ£¬ÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§ËÑË÷
+				if (type[G[v.id][j].id] == 1)//å¦‚æœæ˜¯æœªå®‰æ’è¿‡ç±»å‹çš„å«æ˜Ÿï¼Œåˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1134,7 +1134,7 @@ void research(int i, int cmp_flag = 2)
 
 
 	int check = 0;
-	for (int p = 0; p < alternative_sat.size(); p++)//£¨±ğ°ÑanspºÍpÅª»ìÁË
+	for (int p = 0; p < alternative_sat.size(); p++)//ï¼ˆåˆ«æŠŠanspå’Œpå¼„æ··äº†
 	{
 		int find = alternative_sat[p];
 		int flag = 0;
@@ -1144,7 +1144,7 @@ void research(int i, int cmp_flag = 2)
 			ans[ansp++] = find;
 			find = father_id[find];
 			target = edge_target(find, ans[ansp - 1]);
-			if (target != -1 && target != ans[0] && find != i)//ÒÑ¾­ÓĞ»ùÕ¾Õ÷ÓÃÁËÕâÌõ±ß£¬ÇÒ½ÓÊÕÎÀĞÇ²»Ò»Ñù
+			if (target != -1 && target != ans[0] && find != i)//å·²ç»æœ‰åŸºç«™å¾ç”¨äº†è¿™æ¡è¾¹ï¼Œä¸”æ¥æ”¶å«æ˜Ÿä¸ä¸€æ ·
 			{
 				int other_use_this_edge = 0;
 				for (int x = 0; x < N; x++)
@@ -1190,12 +1190,12 @@ void research(int i, int cmp_flag = 2)
 		route[i].clear();
 		keep_type_correct();
 		
-		type[ans[0]] = 3;//È·¶¨½ÓÊÕÎÀĞÇÉí·İ
-		for (int w = ansp - 2; w >= 1; w--)//È·¶¨ÑØÍ¾ÎÀĞÇÎªÖĞ×ªÎÀĞÇÉí·İ
+		type[ans[0]] = 3;//ç¡®å®šæ¥æ”¶å«æ˜Ÿèº«ä»½
+		for (int w = ansp - 2; w >= 1; w--)//ç¡®å®šæ²¿é€”å«æ˜Ÿä¸ºä¸­è½¬å«æ˜Ÿèº«ä»½
 		{
 			type[ans[w]] = 2;
 		}
-		for (int w = ansp - 1; w >= 1; w--)//¸øÂ·¾¶ÉÏÃ¿Ìõ±ß´òÉÏ±ê¼Ç£¨½ÓÊÕÎÀĞÇµÄid
+		for (int w = ansp - 1; w >= 1; w--)//ç»™è·¯å¾„ä¸Šæ¯æ¡è¾¹æ‰“ä¸Šæ ‡è®°ï¼ˆæ¥æ”¶å«æ˜Ÿçš„id
 		{
 			set_edge_target(ans[w], ans[w - 1], ans[0]);
 		}
@@ -1209,7 +1209,7 @@ void research(int i, int cmp_flag = 2)
 		check = 1;
 		break;
 	}
-	if (check == 0)//±éÀúÍêÕû¸ö±¸Ñ¡¶ÓÁĞ¶¼ÕÒ²»µ½ÄÜ×÷Îª½ÓÊÕÎÀĞÇµÄ£¨µ½´ïµÄÂ·ÉÏ¶¼·¢ÉúÁË³åÍ»£©
+	if (check == 0)//éå†å®Œæ•´ä¸ªå¤‡é€‰é˜Ÿåˆ—éƒ½æ‰¾ä¸åˆ°èƒ½ä½œä¸ºæ¥æ”¶å«æ˜Ÿçš„ï¼ˆåˆ°è¾¾çš„è·¯ä¸Šéƒ½å‘ç”Ÿäº†å†²çªï¼‰
 	{
 		
 
@@ -1222,7 +1222,7 @@ void research(int i, int cmp_flag = 2)
 				closest_dis = G[i][x].dis;
 			}
 		}
-		type[closest_sat] = 3;//ÌâÄ¿Ã»ÓĞ±£Ö¤Ò»¸ö»ùÕ¾Ö»Á¬½ÓÁËÒ»¸öÎÀĞÇ
+		type[closest_sat] = 3;//é¢˜ç›®æ²¡æœ‰ä¿è¯ä¸€ä¸ªåŸºç«™åªè¿æ¥äº†ä¸€ä¸ªå«æ˜Ÿ
 		already_research[i] = 1;
 		anscount++;
 		route[i].push_back(closest_sat); route[i].push_back(-1);
@@ -1235,7 +1235,7 @@ void research(int i, int cmp_flag = 2)
 				{
 					if (route[x][j] == closest_sat)
 					{
-						route[x][j + 1] = -1;//Ö±½Óµ½´ËÎªÖ¹£¬°ÑºóÂ·¶ÏÁË
+						route[x][j + 1] = -1;//ç›´æ¥åˆ°æ­¤ä¸ºæ­¢ï¼ŒæŠŠåè·¯æ–­äº†
 						set_edge_target(x, route[x][0], closest_sat);
 						for (int k = 1; k <= j; k++)
 						{
@@ -1287,7 +1287,7 @@ void count_sat_times(int route_flag = 0)
 		}
 	}
 }
-int bfs_with_target2(int i, int sat_id)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½ÎÀĞÇsat_idµÄ(ÎŞ³åÍ»)Â·¾¶£¬±£´æÔÚans[]ÖĞ£¬ÆäÖĞans[0]==sat_idÇÒans[ansp-1]Îªbst_id(µ¹Ğğ)£¬²¢·µ»Øansp£¬Ê§°ÜÔò·µ»Ø-1
+int bfs_with_target2(int i, int sat_id)//å¯»æ±‚ä¸€æ¡ä»åŸºç«™iåˆ°å«æ˜Ÿsat_idçš„(æ— å†²çª)è·¯å¾„ï¼Œä¿å­˜åœ¨ans[]ä¸­ï¼Œå…¶ä¸­ans[0]==sat_idä¸”ans[ansp-1]ä¸ºbst_id(å€’å™)ï¼Œå¹¶è¿”å›anspï¼Œå¤±è´¥åˆ™è¿”å›-1
 {
 	int visited[5005]; int flag = 0;
 	int father_id[5005]; int real_dis[5005];
@@ -1309,12 +1309,12 @@ int bfs_with_target2(int i, int sat_id)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½ÎÀĞÇsat_idµÄ(ÎŞ³åÍ»)Â·
 			{
 				continue;
 			}
-			//ÓĞÂ·¾¶³åÍ»µÄ±ßÖ±½Ó²»×ß
+			//æœ‰è·¯å¾„å†²çªçš„è¾¹ç›´æ¥ä¸èµ°
 
 			if (visited[G[v.id][j].id] == 0)
 			{
 				if (v.dis + G[v.id][j].dis > D)continue;
-				if (G[v.id][j].id == sat_id)//³É¹¦µ½´ïÁËÄ¿±ê£¬²»ÓÃÑØ×ÅÕâÀï¼ÌĞøËÑË÷
+				if (G[v.id][j].id == sat_id)//æˆåŠŸåˆ°è¾¾äº†ç›®æ ‡ï¼Œä¸ç”¨æ²¿ç€è¿™é‡Œç»§ç»­æœç´¢
 				{
 					flag = 1;
 					visited[G[v.id][j].id] = 1;
@@ -1322,7 +1322,7 @@ int bfs_with_target2(int i, int sat_id)//Ñ°ÇóÒ»Ìõ´Ó»ùÕ¾iµ½ÎÀĞÇsat_idµÄ(ÎŞ³åÍ»)Â·
 					real_dis[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type2[G[v.id][j].id] == 3)//²»ÊÇÄ¿±êÎÀĞÇµÄ½ÓÊÕÎÀĞÇ£¬²»·ÅÔÚÂ·¾¶Ê÷ÖĞ
+				if (type2[G[v.id][j].id] == 3)//ä¸æ˜¯ç›®æ ‡å«æ˜Ÿçš„æ¥æ”¶å«æ˜Ÿï¼Œä¸æ”¾åœ¨è·¯å¾„æ ‘ä¸­
 				{
 					visited[G[v.id][j].id] = 1;
 					continue;
@@ -1377,7 +1377,7 @@ void remake_search(int i)
 	if (already_has_home2[i] == 1)return;
 	int visited[5005]; int exist_in_alternative[5005];  int father_id[5005];
 	int ansp = 0;
-	vector<int>alternative_sat;//ÔÚ»ùÕ¾iÏòÍâbfs¹ı³ÌÖĞÕÒµ½µÄ¼¸¸öÊÊºÏÉèÖÃÎª½ÓÊÕÎÀĞÇµÄÎÀĞÇid
+	vector<int>alternative_sat;//åœ¨åŸºç«™iå‘å¤–bfsè¿‡ç¨‹ä¸­æ‰¾åˆ°çš„å‡ ä¸ªé€‚åˆè®¾ç½®ä¸ºæ¥æ”¶å«æ˜Ÿçš„å«æ˜Ÿid
 	memset(visited, 0, sizeof(visited));
 	memset(father_id, -1, sizeof(father_id));
 	memset(exist_in_alternative, 0, sizeof(exist_in_alternative));
@@ -1396,12 +1396,12 @@ void remake_search(int i)
 			}
 			if (visited[G[v.id][j].id] == 0)
 			{
-				if (v.dis + G[v.id][j].dis > D)//Èç¹ûÔÚÏŞÖÆ¾àÀëÄÚ£¬ÎŞ·¨µ½´ïG[v.id][j].id
+				if (v.dis + G[v.id][j].dis > D)//å¦‚æœåœ¨é™åˆ¶è·ç¦»å†…ï¼Œæ— æ³•åˆ°è¾¾G[v.id][j].id
 				{
 					continue;
 				}
 				int flag = 0; int lost_bst_id = -1;
-				if (type2[G[v.id][j].id] == 3)//G[v.id][j].idÒÑ¾­±»È·¶¨¹ıÎª½ÓÊÕÎÀĞÇ£¬Ö±½ÓÁĞÈë±¸Ñ¡£¬Í£Ö¹ÕâÌõ·ÖÖ§µÄËÑË÷
+				if (type2[G[v.id][j].id] == 3)//G[v.id][j].idå·²ç»è¢«ç¡®å®šè¿‡ä¸ºæ¥æ”¶å«æ˜Ÿï¼Œç›´æ¥åˆ—å…¥å¤‡é€‰ï¼Œåœæ­¢è¿™æ¡åˆ†æ”¯çš„æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1413,7 +1413,7 @@ void remake_search(int i)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type2[G[v.id][j].id] == 2)//Èç¹ûÒÑ¾­È·¶¨ÎªÖĞ×ªÎÀĞÇ£¬Ôò²»¿ÉÄÜÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§¼ÌĞøËÑË÷
+				if (type2[G[v.id][j].id] == 2)//å¦‚æœå·²ç»ç¡®å®šä¸ºä¸­è½¬å«æ˜Ÿï¼Œåˆ™ä¸å¯èƒ½åˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯ç»§ç»­æœç´¢
 				{
 					visited[G[v.id][j].id] = 1;
 					father_id[G[v.id][j].id] = v.id;
@@ -1422,7 +1422,7 @@ void remake_search(int i)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type2[G[v.id][j].id] == 1)//Èç¹ûÊÇÎ´°²ÅÅ¹ıÀàĞÍµÄÎÀĞÇ£¬ÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§ËÑË÷
+				if (type2[G[v.id][j].id] == 1)//å¦‚æœæ˜¯æœªå®‰æ’è¿‡ç±»å‹çš„å«æ˜Ÿï¼Œåˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1438,11 +1438,11 @@ void remake_search(int i)
 				}
 
 			}
-			else if (visited[G[v.id][j].id] == 1)//ÊÔÍ¼ÈÃbfsÄÜµÃµ½×î¶ÌÂ·¾¶Ê÷¡¾bug?¡¿
+			else if (visited[G[v.id][j].id] == 1)//è¯•å›¾è®©bfsèƒ½å¾—åˆ°æœ€çŸ­è·¯å¾„æ ‘ã€bug?ã€‘
 			{
 				if (v.dis + G[v.id][j].dis > real_dis_to_sat[G[v.id][j].id])continue;
 				int flag = 0; int lost_bst_id;
-				if (type2[G[v.id][j].id] == 3)//G[v.id][j].idÒÑ¾­±»È·¶¨¹ıÎª½ÓÊÕÎÀĞÇ£¬Ö±½ÓÁĞÈë±¸Ñ¡£¬Í£Ö¹ÕâÌõ·ÖÖ§µÄËÑË÷
+				if (type2[G[v.id][j].id] == 3)//G[v.id][j].idå·²ç»è¢«ç¡®å®šè¿‡ä¸ºæ¥æ”¶å«æ˜Ÿï¼Œç›´æ¥åˆ—å…¥å¤‡é€‰ï¼Œåœæ­¢è¿™æ¡åˆ†æ”¯çš„æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1453,7 +1453,7 @@ void remake_search(int i)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type2[G[v.id][j].id] == 2)//Èç¹ûÒÑ¾­È·¶¨ÎªÖĞ×ªÎÀĞÇ£¬Ôò²»¿ÉÄÜÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§¼ÌĞøËÑË÷
+				if (type2[G[v.id][j].id] == 2)//å¦‚æœå·²ç»ç¡®å®šä¸ºä¸­è½¬å«æ˜Ÿï¼Œåˆ™ä¸å¯èƒ½åˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯ç»§ç»­æœç´¢
 				{
 					father_id[G[v.id][j].id] = v.id;
 					Node a(G[v.id][j].id, v.dis + G[v.id][j].dis);
@@ -1461,7 +1461,7 @@ void remake_search(int i)
 					real_dis_to_sat[G[v.id][j].id] = v.dis + G[v.id][j].dis;
 					continue;
 				}
-				if (type2[G[v.id][j].id] == 1)//Èç¹ûÊÇÎ´°²ÅÅ¹ıÀàĞÍµÄÎÀĞÇ£¬ÁĞÈë±¸Ñ¡£¬¿ÉÒÔÑØ×ÅÕâÌõ·ÖÖ§ËÑË÷
+				if (type2[G[v.id][j].id] == 1)//å¦‚æœæ˜¯æœªå®‰æ’è¿‡ç±»å‹çš„å«æ˜Ÿï¼Œåˆ—å…¥å¤‡é€‰ï¼Œå¯ä»¥æ²¿ç€è¿™æ¡åˆ†æ”¯æœç´¢
 				{
 					if (exist_in_alternative[G[v.id][j].id] == 0)
 					{
@@ -1493,7 +1493,7 @@ void remake_search(int i)
 			find = father_id[find];
 			target2 = edge_target2(find, ans[ansp - 1]);
 			
-			if (target2 != -1 && target2 != ans[0])//ÒÑ¾­ÓĞ»ùÕ¾Õ÷ÓÃÁËÕâÌõ±ß£¬ÇÒ½ÓÊÕÎÀĞÇ²»Ò»Ñù
+			if (target2 != -1 && target2 != ans[0])//å·²ç»æœ‰åŸºç«™å¾ç”¨äº†è¿™æ¡è¾¹ï¼Œä¸”æ¥æ”¶å«æ˜Ÿä¸ä¸€æ ·
 			{
 				flag = 1; break;
 			}
@@ -1521,14 +1521,14 @@ void remake_search(int i)
 		already_has_home2[i] = 1;
 		
 
-		type2[ans[0]] = 3;//È·¶¨½ÓÊÕÎÀĞÇÉí·İ
+		type2[ans[0]] = 3;//ç¡®å®šæ¥æ”¶å«æ˜Ÿèº«ä»½
 
 		
-		for (int w = ansp - 2; w >= 1; w--)//È·¶¨ÑØÍ¾ÎÀĞÇÎªÖĞ×ªÎÀĞÇÉí·İ
+		for (int w = ansp - 2; w >= 1; w--)//ç¡®å®šæ²¿é€”å«æ˜Ÿä¸ºä¸­è½¬å«æ˜Ÿèº«ä»½
 		{
 			type2[ans[w]] = 2;
 		}
-		for (int w = ansp - 1; w >= 1; w--)//¸øÂ·¾¶ÉÏÃ¿Ìõ±ß´òÉÏ±ê¼Ç£¨½ÓÊÕÎÀĞÇµÄid
+		for (int w = ansp - 1; w >= 1; w--)//ç»™è·¯å¾„ä¸Šæ¯æ¡è¾¹æ‰“ä¸Šæ ‡è®°ï¼ˆæ¥æ”¶å«æ˜Ÿçš„id
 		{
 			set_edge_target2(ans[w], ans[w - 1], ans[0]);
 		}
@@ -1543,7 +1543,7 @@ void remake_search(int i)
 		check = 1;
 		break;
 	}
-	if (check == 0)//±éÀúÍêÕû¸ö±¸Ñ¡¶ÓÁĞ¶¼ÕÒ²»µ½ÄÜ×÷Îª½ÓÊÕÎÀĞÇµÄ£¨µ½´ïµÄÂ·ÉÏ¶¼·¢ÉúÁË³åÍ»£©
+	if (check == 0)//éå†å®Œæ•´ä¸ªå¤‡é€‰é˜Ÿåˆ—éƒ½æ‰¾ä¸åˆ°èƒ½ä½œä¸ºæ¥æ”¶å«æ˜Ÿçš„ï¼ˆåˆ°è¾¾çš„è·¯ä¸Šéƒ½å‘ç”Ÿäº†å†²çªï¼‰
 	{
 		
 
@@ -1556,7 +1556,7 @@ void remake_search(int i)
 				closest_dis = G[i][x].dis;
 			}
 		}
-		type2[closest_sat] = 3;//ÌâÄ¿Ã»ÓĞ±£Ö¤Ò»¸ö»ùÕ¾Ö»Á¬½ÓÁËÒ»¸öÎÀĞÇ
+		type2[closest_sat] = 3;//é¢˜ç›®æ²¡æœ‰ä¿è¯ä¸€ä¸ªåŸºç«™åªè¿æ¥äº†ä¸€ä¸ªå«æ˜Ÿ
 		already_has_home2[i] = 1;
 		
 		route2[i].push_back(closest_sat); route2[i].push_back(-1);
@@ -1569,7 +1569,7 @@ void remake_search(int i)
 				{
 					if (route2[x][j] == closest_sat)
 					{
-						route2[x][j + 1] = -1;//Ö±½Óµ½´ËÎªÖ¹£¬°ÑºóÂ·¶ÏÁË
+						route2[x][j + 1] = -1;//ç›´æ¥åˆ°æ­¤ä¸ºæ­¢ï¼ŒæŠŠåè·¯æ–­äº†
 						set_edge_target2(x, route2[x][0], closest_sat);
 						for (int k = 1; k <= j; k++)
 						{
@@ -1649,14 +1649,14 @@ int main(int argc, char *argv[])
 	freopen("semi_finals_training-2.txt", "r", stdin);
 	freopen("semi_out.txt", "w", stdout);
 	cin >> N >> E >> C >> D >> PS;
-	//if (D > 475)D = 475;//¿ÉÄÜÓëÆ½¾ù±ß³¤£¬PSºÍCÖµÓĞ¹Ø
+	//if (D > 475)D = 475;//å¯èƒ½ä¸å¹³å‡è¾¹é•¿ï¼ŒPSå’ŒCå€¼æœ‰å…³
 	//if (D > 1000)D = 1000;
 	for (int i = 0; i < N; i++)
 	{
 		cin >> type[i];
 		if (type[i] == 1)
 		{
-			sat[i].id = i;//ÆäÊµ¸ù±¾Ã»ÓÃÉÏ£¨£©
+			sat[i].id = i;
 			sat_number++;
 		}
 		else if (type[i] == 0)
@@ -1678,7 +1678,7 @@ int main(int argc, char *argv[])
 		G[u].push_back(b);
 		G[v].push_back(a);
 	}
-	for (int i = 0; i < N; i++)//ÅÅ²»ÅÅĞò£¬°´Ê²Ã´·½Ê½ÅÅĞò£¬½á¹ûÊÇ²»Ò»ÑùµÄ
+	for (int i = 0; i < N; i++)//æ’ä¸æ’åºï¼ŒæŒ‰ä»€ä¹ˆæ–¹å¼æ’åºï¼Œç»“æœæ˜¯ä¸ä¸€æ ·çš„
 	{
 		sort(G[i].begin(), G[i].end(), cmp);
 	}
